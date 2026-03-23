@@ -19,9 +19,6 @@ class ICommInterface {
 public:
     virtual ~ICommInterface() = default;
 
-    virtual bool connect() = 0;
-    virtual void disconnect() = 0;
-    virtual bool isConnected() const = 0;
 
     virtual bool sendCommand(const std::string& command) = 0;
 

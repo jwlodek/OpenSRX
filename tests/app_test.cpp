@@ -1,11 +1,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "opensrx/app.hpp"
+#include "opensrx/api.hpp"
 
 using ::testing::HasSubstr;
 
-TEST(AppTest, ReturnsProjectName)
-{
-    EXPECT_THAT(opensrx::app_name(), HasSubstr("OpenSRX"));
+TEST(AppTest, ReturnsProjectName) { EXPECT_THAT(OpenSRX::app_name(), HasSubstr("OpenSRX")); }
+
+TEST(VersionTest, ExposesVersionProgrammatically) {
+    EXPECT_EQ(OpenSRX::GetVersion<std::string>(), "0.1.0");
+    EXPECT_EQ(OpenSRX::GetVersion<OpenSRX::VersionTuple>(), OpenSRX::VersionTuple(0, 1, 0));
 }

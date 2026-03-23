@@ -6,3 +6,6 @@ lib/
 *.o
 *.so
 *.a
+# pixi environments
+.pixi/*
+!.pixi/config.toml

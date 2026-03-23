@@ -1,0 +1,14 @@
+[workspace]
+authors = ["Jakub Wlodek <jwlodek@bnl.gov>"]
+channels = ["conda-forge"]
+name = "OpenSRX"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+lint = "pre-commit run --all-files"
+
+[dependencies]
+pre-commit = ">=4.5.1,<5"
+clang-format = ">=22.1.0,<23"
+python = ">=3.13,<3.14"

@@ -11,6 +11,8 @@ add_library(opensrx ${OPENSRX_LIBRARY_TYPE}
 target_include_directories(opensrx
     PUBLIC
         ${PROJECT_SOURCE_DIR}/include
+    PRIVATE
+        ${OPENSRX_GENERATED_INCLUDE_DIR}
 )
 
 if(NOT BUILD_STATIC_LIB)

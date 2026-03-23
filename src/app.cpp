@@ -1,10 +1,20 @@
-#include "opensrx/app.hpp"
+#include <tuple>
 
-namespace opensrx {
+#include "opensrx/api.hpp"
+#include "opensrx/version.hpp"
 
-std::string app_name()
-{
-    return "OpenSRX";
+namespace OpenSRX {
+
+std::string app_name() { return "OpenSRX"; }
+
+template <>
+std::string GetVersion<std::string>() {
+    return std::string(versionString);
 }
 
-} // namespace opensrx
+template <>
+VersionTuple GetVersion<VersionTuple>() {
+    return std::make_tuple(versionMajor, versionMinor, versionPatch);
+}
+
+}  // namespace OpenSRX

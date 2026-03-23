@@ -1,9 +1,8 @@
 #include <iostream>
 
-#include "opensrx/app.hpp"
+#include "opensrx/api.hpp"
 
-int main()
-{
-    std::cout << "Hello from " << opensrx::app_name() << '\n';
+int main() {
+    std::cout << "Hello from " << OpenSRX::app_name() << '\n';
     return 0;
 }

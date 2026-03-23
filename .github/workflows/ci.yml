@@ -1,0 +1,59 @@
+---
+
+name: CI
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@8ca4608ef7f4daeb54f5205b20d0b7cb42f11143  # v0.8.14
+        with:
+          pixi-version: v0.56.0
+          cache: false
+          frozen: true
+
+      - name: Run linting checks
+        run: pixi run lint
+
+  build:
+    name: Build and Test on EL${{ matrix.el_version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        el_version: [9, 10]
+
+    container: almalinux:${{ matrix.el_version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install dependencies
+        run: |
+          dnf install -y cmake make gcc g++
+
+      - name: Build project
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make -j$(nproc)
+
+      - name: Run tests
+        run: |
+          ./build/tests/TestOpenSRX

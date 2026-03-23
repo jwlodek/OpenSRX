@@ -4,5 +4,5 @@ add_executable(opensrx_example
 
 target_link_libraries(opensrx_example
     PRIVATE
-        ${OPENSRX_EXAMPLE_LINK_TARGET}
+        opensrx
 )

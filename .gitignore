@@ -1,1 +1,8 @@
 build/
+build*/
+.vscode/
+bin/
+lib/
+*.o
+*.so
+*.a

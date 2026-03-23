@@ -3,7 +3,7 @@
 Basic CMake project scaffold with:
 
 - a root `CMakeLists.txt`
-- separate shared and static library toggles for sources under `src/`
+- a shared library by default, or a static library when requested
 - public headers under `include/`
 - example binaries under `examples/`
 - a placeholder `tests/` directory
@@ -20,9 +20,12 @@ cmake --build build
 
 ```bash
 cmake -S . -B build -DBUILD_STATIC_LIB=ON
-cmake -S . -B build -DBUILD_SHARED_LIB=OFF -DBUILD_STATIC_LIB=ON
 cmake -S . -B build -DBUILD_TESTS=OFF
 cmake -S . -B build -DBUILD_EXAMPLES=OFF
 ```
 
-At least one of `BUILD_SHARED_LIB` or `BUILD_STATIC_LIB` must be `ON`.
+`BUILD_STATIC_LIB=OFF` builds the shared library. `BUILD_STATIC_LIB=ON` builds the static library instead.
+
+## Test Dependencies
+
+Tests use CMake `FetchContent` to download GoogleTest and GoogleMock version `1.17.0` during configure.

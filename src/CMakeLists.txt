@@ -5,11 +5,11 @@ else()
 endif()
 
 add_library(OpenSRX ${OPENSRX_LIBRARY_TYPE}
-    app.cpp
     Scanner.cpp
     SerialInterface.cpp
     SocketInterface.cpp
     Timestamp.cpp
+    Utils.cpp
     ICommInterface.cpp
 )
 

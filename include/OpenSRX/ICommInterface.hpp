@@ -2,6 +2,8 @@
 #include <asio.hpp>
 #include <string>
 
+class MockCommInterface;
+
 namespace OpenSRX {
 
 enum class ErrCode {
@@ -65,12 +67,18 @@ class ICommInterface {
    public:
     friend class SocketInterface;
     friend class SerialInterface;
+
+    // This is not very nice, but we want to be able to test the helper utility functions
+    friend class MockCommInterface;
+
     virtual ~ICommInterface() = default;
     virtual std::string sendCommand(const std::string& command) = 0;
     virtual std::string describe() const = 0;
-    // void setCommFormat(CommFormat format);
+    void setCommFormat(CommFormat format);
+    CommFormat getCommFormat() { return commFormat; }
 
    private:
+    std::string stripEcho(const std::string& response, const std::string& command);
     std::string addHeaderAndTerminator(const std::string& command);
     CommFormat commFormat = CommFormat::NO_HEADER_CR_IN_CR_OUT;
     std::string inTermStr = "\r";

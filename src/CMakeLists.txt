@@ -6,7 +6,6 @@ endif()
 
 add_library(OpenSRX ${OPENSRX_LIBRARY_TYPE}
     app.cpp
-    Utils.cpp
     Scanner.cpp
     SerialInterface.cpp
     SocketInterface.cpp

@@ -1,15 +1,13 @@
 #include "OpenSRX/Scanner.hpp"
 
-#include <spdlog/spdlog.h>
-
 namespace OpenSRX {
 
 std::tuple<std::string, std::string> parseVersionInfo(const std::string& raw) {
     // The response to the "KEYENCE" command is expected to be in the format "Model,FirmwareVersion"
     auto commaPos = raw.find(',');
-    if (commaPos == std::string::npos) {
+    if (commaPos == std::string::npos)
         throw std::runtime_error("Unexpected version info format: " + raw);
-    }
+
     std::string model = raw.substr(0, commaPos);
     std::string firmwareVersion = raw.substr(commaPos + 1);
     return {model, firmwareVersion};

@@ -12,9 +12,8 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(TestOpenSRX
     TestOpenSRX.cpp
-    TestUtils.cpp
+    TestICommInterface.cpp
     TestTimestamp.cpp
-    app_test.cpp
 )
 
 target_link_libraries(TestOpenSRX

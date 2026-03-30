@@ -1,5 +1,4 @@
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
+#include "TestOpenSRX.hpp"
 
 class PrintRequestsAndReturnsOnFailure : public ::testing::EmptyTestEventListener {
     virtual void OnTestStart(const ::testing::TestInfo& /*test_info*/) override {
@@ -22,6 +21,11 @@ class PrintRequestsAndReturnsOnFailure : public ::testing::EmptyTestEventListene
         }
     }
 };
+
+TEST(TestOpenSRX, TestExposesVersionProgrammatically) {
+    EXPECT_EQ(OpenSRX::GetVersion<std::string>(), "0.1.0");
+    EXPECT_EQ(OpenSRX::GetVersion<OpenSRX::VersionTuple>(), OpenSRX::VersionTuple(0, 1, 0));
+}
 
 // Main function to run tests
 int main(int argc, char** argv) {

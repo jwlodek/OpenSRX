@@ -13,6 +13,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(TestOpenSRX
     TestOpenSRX.cpp
     TestUtils.cpp
+    TestTimestamp.cpp
     app_test.cpp
 )
 

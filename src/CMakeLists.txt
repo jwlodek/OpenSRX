@@ -10,6 +10,8 @@ add_library(OpenSRX ${OPENSRX_LIBRARY_TYPE}
     Scanner.cpp
     SerialInterface.cpp
     SocketInterface.cpp
+    Timestamp.cpp
+    ICommInterface.cpp
 )
 
 target_link_libraries(OpenSRX

@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <OpenSRX/Utils.hpp>
 
 TEST(TestUtils, StripEcho) {

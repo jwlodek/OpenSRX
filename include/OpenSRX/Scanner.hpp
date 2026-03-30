@@ -1,7 +1,7 @@
 #pragma once
 
-#include "OpenSRX/OpenSRX.hpp"
 #include "OpenSRX/ICommInterface.hpp"
+#include "OpenSRX/OpenSRX.hpp"
 #include "OpenSRX/Timestamp.hpp"
 
 namespace OpenSRX {
@@ -33,30 +33,33 @@ enum class BusyStatus {
     AUTO_FOCUSING = 4,
 };
 
+std::tuple<std::string, std::string> parseVersionInfo(const std::string& raw);
 
 class Scanner {
-public:
-Scanner(ICommInterface& comm);
-~Scanner() = default;
+   public:
+    Scanner(ICommInterface& comm);
+    ~Scanner() = default;
 
-std::tuple<std::string, std::string> getVersionInfo();
-// std::string getMacAddress();
+    std::string getModel() const { return model; }
+    std::string getFirmwareVersion() const { return firmwareVersion; }
+    std::string getMacAddress() const { return macAddress; }
 
-// CommandStatus getCommandStatus();
-// ErrorStatus getErrorStatus();
-// BusyStatus getBusyStatus();
+    // std::string getMacAddress();
 
-// std::string read();
-// std::string read(int bank);
-// void stopReading();
+    // CommandStatus getCommandStatus();
+    // ErrorStatus getErrorStatus();
+    // BusyStatus getBusyStatus();
 
-// Timestamp getTime();
-// void setTime(const Timestamp& timestamp);
+    // std::string read();
+    // std::string read(int bank);
+    // void stopReading();
 
+    // Timestamp getTime();
+    // void setTime(const Timestamp& timestamp);
 
-private:
-ICommInterface& comm;
-
+   private:
+    ICommInterface& comm;
+    std::string model, firmwareVersion, macAddress;
 };
 
 }  // namespace OpenSRX

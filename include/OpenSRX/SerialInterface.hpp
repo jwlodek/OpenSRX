@@ -1,6 +1,7 @@
 #pragma once
 
 #include <asio.hpp>
+
 #include "OpenSRX/ICommInterface.hpp"
 
 namespace OpenSRX {
@@ -28,14 +29,17 @@ enum class FlowControl {
 };
 
 class SerialInterface : public ICommInterface {
-public:
-    SerialInterface(std::string port = "/dev/ttyUSB0", int baudRate = 115200, DataBits dataBits = DataBits::EIGHT, Parity parity = Parity::EVEN, StopBits stopBits = StopBits::ONE, FlowControl flowControl = FlowControl::NONE);
+   public:
+    SerialInterface(std::string port = "/dev/ttyUSB0", int baudRate = 115200,
+                    DataBits dataBits = DataBits::EIGHT, Parity parity = Parity::EVEN,
+                    StopBits stopBits = StopBits::ONE, FlowControl flowControl = FlowControl::NONE);
     ~SerialInterface() override;
+    std::string describe() const override { return port; }
 
     std::string sendCommand(const std::string& command) override;
 
-private:
-
+   private:
+    std::string port;
     asio::io_context ioContext;
     asio::serial_port serial;
 };

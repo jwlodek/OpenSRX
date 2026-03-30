@@ -1,28 +1,25 @@
 
+#include "OpenSRX/SerialInterface.hpp"
+
+#include <asio.hpp>
 #include <iostream>
 #include <string>
-#include <asio.hpp>
-#include "OpenSRX/SerialInterface.hpp"
 
 namespace OpenSRX {
 
-SerialInterface::SerialInterface(std::string port, int baudRate, DataBits dataBits, Parity parity, StopBits stopBits, FlowControl flowControl)
-    : serial(ioContext, port) {
-
-        // Configure 115200 / 8 / E / 1
-        serial.set_option(asio::serial_port_base::baud_rate(baudRate));
-        serial.set_option(asio::serial_port_base::character_size(8));
-        serial.set_option(asio::serial_port_base::parity(
-            asio::serial_port_base::parity::even));
-        serial.set_option(asio::serial_port_base::stop_bits(
-            asio::serial_port_base::stop_bits::one));
-        serial.set_option(asio::serial_port_base::flow_control(
-            asio::serial_port_base::flow_control::none));
+SerialInterface::SerialInterface(std::string port, int baudRate, DataBits dataBits, Parity parity,
+                                 StopBits stopBits, FlowControl flowControl)
+    : port(port), serial(ioContext, port) {
+    // Configure 115200 / 8 / E / 1
+    serial.set_option(asio::serial_port_base::baud_rate(baudRate));
+    serial.set_option(asio::serial_port_base::character_size(8));
+    serial.set_option(asio::serial_port_base::parity(asio::serial_port_base::parity::even));
+    serial.set_option(asio::serial_port_base::stop_bits(asio::serial_port_base::stop_bits::one));
+    serial.set_option(
+        asio::serial_port_base::flow_control(asio::serial_port_base::flow_control::none));
 }
 
-SerialInterface::~SerialInterface() {
-    serial.close();
-}
+SerialInterface::~SerialInterface() { serial.close(); }
 
 std::string SerialInterface::sendCommand(const std::string& command) {
     asio::write(serial, asio::buffer(command));
@@ -38,8 +35,8 @@ std::string SerialInterface::sendCommand(const std::string& command) {
 
     // Check if line startswith "OK" to indicate successful command execution
     if (line.rfind("OK", 0) == 0) {
-        line = line.substr(2); // Remove "OK" prefix
-        // Next we should get a 
+        line = line.substr(2);  // Remove "OK" prefix
+        // Next we should get a
 
     } else {
         throw std::runtime_error("Command execution failed: " + line);

@@ -1,4 +1,5 @@
 #pragma once
+#include <asio.hpp>
 #include <string>
 
 namespace OpenSRX {
@@ -54,23 +55,24 @@ enum class ErrCode {
 
 };
 
-enum class Header {
-    NONE = 0,
-    STX = 1,
+enum class CommFormat {
+    NO_HEADER_CR_IN_CR_OUT = 0,
+    NO_HEADER_CRLF_IN_CR_OUT = 1,
+    STX_HEADER_ETX_IN_ETX_OUT = 2,
 };
-
-enum class Terminator {
-    CR = 0,
-    CRLF = 1,
-    ETX = 2,
-};
-
 
 class ICommInterface {
-public:
+   public:
+    friend class SocketInterface;
+    friend class SerialInterface;
     virtual ~ICommInterface() = default;
     virtual std::string sendCommand(const std::string& command) = 0;
+    virtual std::string describe() const = 0;
+    // void setCommFormat(CommFormat format);
 
-
+   private:
+    std::string addHeaderAndTerminator(const std::string& command);
+    CommFormat commFormat = CommFormat::NO_HEADER_CR_IN_CR_OUT;
+    std::string inTermStr = "\r";
 };
 }  // namespace OpenSRX

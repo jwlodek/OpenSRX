@@ -20,7 +20,4 @@ std::string stripEcho(const std::string& response, const std::string& command) {
     return response;
 }
 
-
-std::tuple<std::string, std::string> parseVersionInfo(const std::string& raw) {
-    
-}
+std::tuple<std::string, std::string> parseVersionInfo(const std::string& raw) {}

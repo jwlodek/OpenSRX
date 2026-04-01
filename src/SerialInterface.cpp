@@ -9,9 +9,11 @@ SerialInterface::SerialInterface(std::string port, int baudRate, DataBits dataBi
     // Configure 115200 / 8 / E / 1
 
     spdlog::debug("Initializing serial connection to {}...", describe());
-    spdlog::debug("Serial port settings - Baud Rate: {}, Data Bits: {}, Parity: {}, Stop Bits: {}, Flow Control: {}",
-                  baudRate, static_cast<int>(dataBits), static_cast<int>(parity),
-                  static_cast<int>(stopBits), static_cast<int>(flowControl));
+    spdlog::debug(
+        "Serial port settings - Baud Rate: {}, Data Bits: {}, Parity: {}, Stop Bits: {}, Flow "
+        "Control: {}",
+        baudRate, static_cast<int>(dataBits), static_cast<int>(parity), static_cast<int>(stopBits),
+        static_cast<int>(flowControl));
     serial.set_option(asio::serial_port_base::baud_rate(baudRate));
     serial.set_option(asio::serial_port_base::character_size(8));
     serial.set_option(asio::serial_port_base::parity(asio::serial_port_base::parity::even));

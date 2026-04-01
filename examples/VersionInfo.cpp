@@ -19,7 +19,10 @@ int main(int argc, char* argv[]) {
         .help("Port number of the scanner (required with --ip)")
         .scan<'i', int>();
 
-    program.add_argument("-d", "--debug").help("Enable debug logging").default_value(false).implicit_value(true);
+    program.add_argument("-d", "--debug")
+        .help("Enable debug logging")
+        .default_value(false)
+        .implicit_value(true);
 
     try {
         program.parse_args(argc, argv);
@@ -35,7 +38,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // OpenSRX uses spdlog for logging. Set the log level based on whether the user passed the --debug flag.
+    // OpenSRX uses spdlog for logging. Set the log level based on whether the user passed the
+    // --debug flag.
     if (program.get<bool>("--debug")) {
         spdlog::set_level(spdlog::level::debug);
     } else {

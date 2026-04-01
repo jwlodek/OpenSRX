@@ -5,6 +5,8 @@
 
 #include "OpenSRX/ICommInterface.hpp"
 
+// Put it in the OpenSRX namespace so we don't need to have the
+// friend class declaration use the global namespace qualifier.
 namespace OpenSRX {
 
 class MockCommInterface : public OpenSRX::ICommInterface {

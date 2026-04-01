@@ -1,7 +1,7 @@
 #pragma once
-#include <asio.hpp>
 #include <spdlog/spdlog.h>
 
+#include <asio.hpp>
 #include <string>
 
 class MockCommInterface;

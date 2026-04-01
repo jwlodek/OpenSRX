@@ -19,12 +19,24 @@ Usage:
 """
 
 import argparse
+import ftplib
+import io
 import logging
+import math
 import random
 import socket
 import string
 import threading
 import time
+from datetime import datetime
+from pathlib import PurePosixPath
+
+try:
+    from PIL import Image, ImageDraw, ImageFont
+
+    _HAS_PIL = True
+except ImportError:
+    _HAS_PIL = False
 
 logging.basicConfig(
     level=logging.INFO,
@@ -74,6 +86,13 @@ class SRX300Simulator:
             "200": "0",   # Reading mode: 0=Standard
             "201": "0",   # Data transmission: 0=Send after read
             "205": "FF",  # Read error character string
+            # Image save destinations (0=Disable, 3=Send by FTP, 5=ROM+FTP)
+            "500": "0",   # Read OK images
+            "501": "0",   # Verification NG images
+            "502": "0",   # Read error images
+            "503": "0",   # Unstable images
+            "504": "0",   # Capture images
+            "505": "0",   # Image saving mode
         }
 
         # Region configuration storage
@@ -87,7 +106,18 @@ class SRX300Simulator:
             "203": str(DEFAULT_PORT),  # Ethernet (server) port
             "003": "0",             # Append checksum
             "006": "0D",            # Terminator setting (0D = CR)
+            # FTP image server settings
+            "400": "0.0.0.0",       # Remote FTP server IP (0.0.0.0 = not set)
+            "401": "admin",          # FTP username
+            "402": "admin",          # FTP password
+            "403": "0",             # Subfolder: 0=Disable, 1=Enable
+            "404": "image",          # Subfolder name
+            "405": "0",             # FTP connection timing
+            "408": "0",             # Passive mode: 0=Disable, 1=Enable
         }
+
+        # Image capture counter (for file naming)
+        self._image_counter = 0
 
         # Status
         self.cmd_status = "none"
@@ -202,12 +232,18 @@ class SRX300Simulator:
             # Quick setup
             "RCON": self._cmd_rcon,
             "RCOFF": self._cmd_rcoff,
+
+            # Capture
+            "SHOT": self._cmd_shot,
         }.get(cmd)
 
         if handler is None:
             # Also check LON with bank suffix: "LON01" etc.
             if cmd.startswith("LON") and len(cmd) > 3:
                 return self._cmd_lon_bank(cmd[3:])
+            # SHOT with bank suffix: "SHOT01" etc.
+            if cmd.startswith("SHOT") and len(cmd) > 4:
+                return self._cmd_shot([cmd[4:]])
             logger.warning("Undefined command: %s", raw)
             return [f"ER,{cmd},{0:02d}"]
 
@@ -359,6 +395,7 @@ class SRX300Simulator:
         logger.info("Settings initialized to defaults")
         self.op_config = {
             "101": "0", "102": "100", "200": "0", "201": "0", "205": "FF",
+            "500": "0", "501": "0", "502": "0", "503": "0", "504": "0", "505": "0",
         }
         self.bank_config.clear()
         self.region_config.clear()
@@ -465,6 +502,21 @@ class SRX300Simulator:
         logger.info("Quick setup code reading stopped")
         return ["OK,RCOFF"]
 
+    # ---- SHOT command ----
+
+    def _cmd_shot(self, params: list[str]) -> list[str]:
+        if not params:
+            return ["ER,SHOT,01"]
+        try:
+            bank = int(params[0])
+            if bank < 1 or bank > 16:
+                return ["ER,SHOT,02"]
+        except ValueError:
+            return ["ER,SHOT,01"]
+        code_data = "".join(random.choices(string.ascii_uppercase + string.digits, k=12))
+        img_name = self._generate_and_push_image(code_data, bank)
+        return [f"OK,SHOT,A:\\IMAGE\\{img_name}"]
+
     # ---- Simulated read result ----
 
     def _simulate_read_result(self, bank: int | None = None) -> str:
@@ -477,7 +529,180 @@ class SRX300Simulator:
             self.bank_counts[bank - 1] += 1
         else:
             self.bank_counts[0] += 1
+
+        # Check if FTP image push is enabled for OK images (WP 500)
+        ok_save = self.op_config.get("500", "0")
+        if ok_save in ("3", "5", "6"):
+            self._generate_and_push_image(code_data, bank or 1)
+
         return code_data
+
+    # ---- Image generation and FTP push ----
+
+    def _generate_and_push_image(
+        self, code_data: str, bank: int, img_width: int = 640, img_height: int = 480
+    ) -> str:
+        """Generate a simulated camera image with barcode and blue bounding box,
+        then push it to the configured FTP server. Returns the image filename."""
+        self._image_counter += 1
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"B{bank:02d}_{timestamp}_{self._image_counter:06d}.bmp"
+
+        if not _HAS_PIL:
+            logger.warning("Pillow not installed; skipping image generation")
+            return filename
+
+        img, corners = self._render_barcode_image(
+            code_data, bank, img_width, img_height
+        )
+        logger.info(
+            "Generated image %s  barcode corners: TL=(%d,%d) TR=(%d,%d) BR=(%d,%d) BL=(%d,%d)",
+            filename, *corners[0], *corners[1], *corners[2], *corners[3],
+        )
+
+        self._ftp_push_image(img, filename)
+        return filename
+
+    @staticmethod
+    def _render_barcode_image(
+        code_data: str,
+        bank: int,
+        img_width: int = 640,
+        img_height: int = 480,
+    ) -> tuple["Image.Image", list[tuple[int, int]]]:
+        """Render a grayscale camera image with a barcode pattern and a blue
+        bounding box.  Returns (PIL Image, list of 4 corner coordinates
+        [TL, TR, BR, BL])."""
+
+        # --- background: noisy gray ---
+        img = Image.new("RGB", (img_width, img_height), (200, 200, 200))
+        draw = ImageDraw.Draw(img)
+
+        # Add some noise texture
+        rng = random.Random(hash(code_data))
+        for y in range(0, img_height, 4):
+            for x in range(0, img_width, 4):
+                g = rng.randint(180, 220)
+                draw.rectangle([x, y, x + 3, y + 3], fill=(g, g, g))
+
+        # --- Compute barcode region with slight rotation ---
+        angle_deg = rng.uniform(-5, 5)
+        angle_rad = math.radians(angle_deg)
+
+        # Barcode dimensions in local space
+        bar_count = len(code_data) * 6 + 11  # rough Code‑128-like bar count
+        bar_w = max(1, min(3, img_width // (bar_count + 20)))
+        barcode_w = bar_count * bar_w
+        barcode_h = max(40, img_height // 6)
+
+        # Center of barcode in image space
+        cx = img_width // 2 + rng.randint(-60, 60)
+        cy = img_height // 2 + rng.randint(-40, 40)
+
+        # Calculate four corner positions (TL, TR, BR, BL) of the barcode rectangle
+        hw, hh = barcode_w / 2, barcode_h / 2
+        cos_a, sin_a = math.cos(angle_rad), math.sin(angle_rad)
+
+        def rotate_point(lx: float, ly: float) -> tuple[int, int]:
+            rx = cx + lx * cos_a - ly * sin_a
+            ry = cy + lx * sin_a + ly * cos_a
+            return (int(round(rx)), int(round(ry)))
+
+        corners = [
+            rotate_point(-hw, -hh),  # top-left
+            rotate_point(+hw, -hh),  # top-right
+            rotate_point(+hw, +hh),  # bottom-right
+            rotate_point(-hw, +hh),  # bottom-left
+        ]
+
+        # --- Draw barcode bars ---
+        # Create the barcode on a small image first, then paste rotated
+        bc_img = Image.new("RGB", (barcode_w, barcode_h), (255, 255, 255))
+        bc_draw = ImageDraw.Draw(bc_img)
+
+        # Quiet zone
+        x_pos = bar_w * 5
+        for ch in code_data:
+            bits = format(ord(ch), "08b")
+            for bit in bits:
+                if bit == "1":
+                    bc_draw.rectangle(
+                        [x_pos, 2, x_pos + bar_w - 1, barcode_h - 3],
+                        fill=(0, 0, 0),
+                    )
+                x_pos += bar_w
+
+        # Rotate barcode image
+        bc_rotated = bc_img.rotate(
+            -angle_deg, resample=Image.BICUBIC, expand=True, fillcolor=(200, 200, 200)
+        )
+        paste_x = cx - bc_rotated.width // 2
+        paste_y = cy - bc_rotated.height // 2
+        img.paste(bc_rotated, (paste_x, paste_y))
+
+        # --- Draw blue bounding box around the barcode corners ---
+        box_color = (0, 80, 255)
+        for i in range(4):
+            draw.line([corners[i], corners[(i + 1) % 4]], fill=box_color, width=2)
+
+        # --- Draw code text below barcode ---
+        try:
+            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 14)
+        except (OSError, IOError):
+            font = ImageFont.load_default()
+
+        text_y = max(c[1] for c in corners) + 6
+        draw.text((cx - len(code_data) * 4, text_y), code_data, fill=(0, 0, 0), font=font)
+
+        # --- Draw bank label ---
+        draw.text((8, 8), f"Bank {bank:02d}", fill=(0, 0, 0), font=font)
+
+        return img, corners
+
+    def _ftp_push_image(self, img: "Image.Image", filename: str) -> None:
+        """Push a PIL Image to the configured FTP server (in a background thread)."""
+        ftp_ip = self.comm_config.get("400", "0.0.0.0")
+        if ftp_ip == "0.0.0.0":
+            logger.debug("FTP server not configured (IP 0.0.0.0); skipping image push")
+            return
+
+        username = self.comm_config.get("401", "admin")
+        password = self.comm_config.get("402", "admin")
+        use_subfolder = self.comm_config.get("403", "0") == "1"
+        subfolder = self.comm_config.get("404", "image")
+        passive = self.comm_config.get("408", "0") == "1"
+
+        remote_path = PurePosixPath(subfolder) / filename if use_subfolder else PurePosixPath(filename)
+
+        buf = io.BytesIO()
+        img.save(buf, format="BMP")
+        buf.seek(0)
+
+        def _do_push():
+            try:
+                ftp = ftplib.FTP()
+                ftp.connect(ftp_ip, 21, timeout=5)
+                ftp.login(username, password)
+                if passive:
+                    ftp.set_pasv(True)
+                else:
+                    ftp.set_pasv(False)
+
+                if use_subfolder:
+                    try:
+                        ftp.mkd(subfolder)
+                    except ftplib.error_perm:
+                        pass  # already exists
+
+                ftp.storbinary(f"STOR {remote_path}", buf)
+                ftp.quit()
+                logger.info("FTP push OK -> %s@%s:%s", username, ftp_ip, remote_path)
+            except Exception as e:
+                logger.error("FTP push failed -> %s: %s", ftp_ip, e)
+                with self._lock:
+                    self.error_status = "hostconnect"
+
+        threading.Thread(target=_do_push, daemon=True).start()
 
 
 class ClientHandler(threading.Thread):
@@ -552,11 +777,43 @@ def main():
         default=DEFAULT_FIRMWARE,
         help=f"Simulated firmware version (default: {DEFAULT_FIRMWARE})",
     )
+    parser.add_argument(
+        "--ftp-server",
+        default=None,
+        help="Remote FTP server IP to push images to (sets WN 400)",
+    )
+    parser.add_argument(
+        "--ftp-user",
+        default="admin",
+        help="FTP username (default: admin)",
+    )
+    parser.add_argument(
+        "--ftp-password",
+        default="admin",
+        help="FTP password (default: admin)",
+    )
+    parser.add_argument(
+        "--ftp-subfolder",
+        default=None,
+        help="FTP subfolder for images (enables WN 403/404)",
+    )
     args = parser.parse_args()
 
     sim = SRX300Simulator(comm_format=args.comm_format)
     sim.model = args.model
     sim.firmware = args.firmware
+
+    # Apply FTP CLI overrides
+    if args.ftp_server:
+        sim.comm_config["400"] = args.ftp_server
+        sim.comm_config["401"] = args.ftp_user
+        sim.comm_config["402"] = args.ftp_password
+        # Enable FTP for OK images by default when server is provided
+        sim.op_config["500"] = "3"
+        logger.info("FTP image push configured -> %s (user: %s)", args.ftp_server, args.ftp_user)
+    if args.ftp_subfolder:
+        sim.comm_config["403"] = "1"
+        sim.comm_config["404"] = args.ftp_subfolder
 
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

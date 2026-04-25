@@ -6,7 +6,7 @@ namespace OpenSRX {
  * @brief Adds an appropriate header and terminator to a command
  *
  * @param command Base command to which the header and terminator should be appended
- * @return std::string The command with the header and terminator added according to the current
+ * @return The command with the header and terminator added according to the current
  * communication format
  */
 std::string ICommInterface::addHeaderAndTerminator(const std::string& command) {
@@ -29,7 +29,7 @@ std::string ICommInterface::addHeaderAndTerminator(const std::string& command) {
  * @param response The response received from the scanner, which may include an echoed command at
  * the start
  * @param command The command that was sent, which may be echoed at the start of the response
- * @return std::string The response with the echoed command stripped from the start, if it was
+ * @return The response with the echoed command stripped from the start, if it was
  * present.
  */
 std::string ICommInterface::stripEcho(const std::string& response, const std::string& command) {

@@ -1,0 +1,42 @@
+# Doxyfile for OpenSRX
+
+PROJECT_NAME           = "OpenSRX"
+PROJECT_BRIEF          = "C++ library for interfacing with Keyence SR series barcode readers"
+PROJECT_NUMBER         = 0.1.0
+OUTPUT_DIRECTORY       = _build
+
+# Input: C++ headers, sources, and markdown guides
+INPUT                  = ../include/OpenSRX \
+                         ../src \
+                         mainpage.md \
+                         guides
+RECURSIVE              = YES
+FILE_PATTERNS          = *.hpp *.h *.cpp *.md
+USE_MDFILE_AS_MAINPAGE = mainpage.md
+
+# HTML output with a navigation tree
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+HTML_COLORSTYLE        = LIGHT
+
+# Disable outputs we don't need
+GENERATE_XML           = NO
+GENERATE_LATEX         = NO
+
+# Extract everything so the API reference is complete
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+
+# Resolve #include paths
+INCLUDE_PATH           = ../include
+
+# Better C++ parsing
+BUILTIN_STL_SUPPORT    = YES
+
+# Markdown support
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES

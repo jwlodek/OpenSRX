@@ -5,6 +5,7 @@ else()
 endif()
 
 add_library(OpenSRX ${OPENSRX_LIBRARY_TYPE}
+    AsioInterface.cpp
     Scanner.cpp
     SerialInterface.cpp
     SocketInterface.cpp

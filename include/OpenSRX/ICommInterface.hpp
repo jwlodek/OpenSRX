@@ -67,8 +67,8 @@ enum class CommFormat {
 
 class ICommInterface {
    public:
-    friend class SocketInterface;
-    friend class SerialInterface;
+    template <typename StreamT>
+    friend class AsioInterface;
 
     // This is not very nice, but we want to be able to test the helper utility functions
     friend class MockCommInterface;

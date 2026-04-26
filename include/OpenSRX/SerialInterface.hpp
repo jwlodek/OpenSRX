@@ -2,7 +2,7 @@
 
 #include <asio.hpp>
 
-#include "OpenSRX/ICommInterface.hpp"
+#include "OpenSRX/AsioInterface.hpp"
 
 namespace OpenSRX {
 
@@ -28,7 +28,7 @@ enum class FlowControl {
     XON_XOFF = asio::serial_port_base::flow_control::software,
 };
 
-class SerialInterface : public ICommInterface {
+class SerialInterface : public AsioInterface<asio::serial_port> {
    public:
     SerialInterface(std::string port = "/dev/ttyUSB0", int baudRate = 115200,
                     DataBits dataBits = DataBits::EIGHT, Parity parity = Parity::EVEN,
@@ -36,12 +36,8 @@ class SerialInterface : public ICommInterface {
     ~SerialInterface() override;
     std::string describe() const override { return port; }
 
-    std::string sendCommand(const std::string& command) override;
-
    private:
     std::string port;
-    asio::io_context ioContext;
-    asio::serial_port serial;
 };
 
 };  // namespace OpenSRX

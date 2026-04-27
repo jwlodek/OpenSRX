@@ -60,6 +60,9 @@ class Scanner {
    private:
     ICommInterface& comm;
     std::string model, firmwareVersion, macAddress;
+
+    template <typename T>
+    T readBank(int bank, )
 };
 
 }  // namespace OpenSRX

@@ -1,0 +1,154 @@
+#pragma once
+
+#include "OpenSRX/ParamValues.hpp"
+
+namespace OpenSRX {
+
+/**
+ * @brief Command numbers for communication configuration (WN/RN commands).
+ *
+ * Used with the WN (write network) and RN (read network) commands in the
+ * format:
+ *   WN,m,n  (write)   RN,m  (read)
+ * where m = command number, n = setting value.
+ *
+ * @note To apply communication configuration changes, a SAVE command must
+ *       be sent afterwards.
+ */
+enum class CommParam {
+    // -- Common communication settings --
+    APPEND_CHECKSUM = 3,
+    APPEND_DATA_SIZE = 4,
+    HEADER_SETTINGS = 5,
+    TERMINATOR_SETTINGS = 6,
+
+    // -- Security settings --
+    AI_NET_CONNECTION = 10,
+
+    // -- RS-232C communication settings --
+    BAUD_RATE_HIGH = 100,
+    DATA_LENGTH = 101,
+    PARITY_CHECK = 102,
+    STOP_BIT_LENGTH = 103,
+    COMM_PROTOCOL = 104,
+    BAUD_RATE_LOW = 105,
+    RS232C_COMMUNICATION = 109,
+    RS232C_HEARTBEAT_SEND = 111,
+
+    // -- RNDIS --
+    RNDIS = 120,
+
+    // -- Ethernet communication settings --
+    IP_ADDRESS = 200,
+    SUBNET_MASK = 201,
+    DEFAULT_GATEWAY = 202,
+    ETHERNET_COMMAND = 203,
+    COMMAND_STANDBY_PORT = 204,
+    ETHERNET_DATA_SERVER = 205,
+    ETHERNET_DATA_SERVER_PORT = 206,
+    ETHERNET_DATA_CLIENT = 207,
+    ETHERNET_DATA_CLIENT_REMOTE_IP_1 = 208,
+    ETHERNET_DATA_CLIENT_REMOTE_PORT_1 = 209,
+    ETHERNET_DATA_CLIENT_REMOTE_IP_2 = 210,
+    ETHERNET_DATA_CLIENT_REMOTE_PORT_2 = 211,
+    TCP_CLIENT_CONNECTION_TIMING = 213,
+    KEEP_ALIVE = 214,
+    HOST_CONNECTION_ERROR_CLIENT = 215,
+    LOGIN_AUTHENTICATION = 220,
+    LOGIN_USER_NAME = 221,
+    LOGIN_PASSWORD = 222,
+    HEARTBEAT_SEND_ETHERNET_SERVER = 225,
+    HEARTBEAT_SEND_ETHERNET_CLIENT = 226,
+
+    // -- Heartbeat settings --
+    HEARTBEAT_SEND_INTERVAL = 230,
+    HEARTBEAT_RESET_ON_DATA_TX = 231,
+    HEARTBEAT_STRING = 232,
+    HEARTBEAT_HEADER = 233,
+    HEARTBEAT_TERMINATOR = 234,
+
+    // -- PLC communication settings --
+    PLC_REMOTE_IP = 300,
+    PLC_REMOTE_PORT = 301,
+    PLC_DEVICE_PORT = 302,
+    PLC_PROTOCOL = 303,
+    PLC_DM_FRONT_ADDRESS = 304,
+    PLC_CONTROL_REGION_ADDRESS = 305,
+    PLC_RESPONSE_REGION_ADDRESS = 306,
+    PLC_OUTPUT_LENGTH = 307,
+    PLC_LINK_TIMING_INPUT = 308,
+    PLC_BIT_MONITORING_PERIOD = 309,
+    PLC_RETRY_INTERVAL = 310,
+    ETHERNET_IP_HANDSHAKE = 321,
+    ETHERNET_IP_INPUT_ASSEMBLY_SIZE = 322,
+    ETHERNET_IP_OUTPUT_ASSEMBLY_SIZE = 323,
+    ETHERNET_IP_BYTE_SWAPPING = 324,
+    PROFINET_DEVICE_NAME = 330,
+    PROFINET_HANDSHAKE = 331,
+    PLC_LINK_ERROR_ON_FAILURE = 334,
+
+    // -- FTP communication settings (image) --
+    FTP_REMOTE_IP = 400,
+    FTP_USER_NAME = 401,
+    FTP_PASSWORD = 402,
+    FTP_SUBFOLDER = 403,
+    FTP_SUBFOLDER_NAME = 404,
+    FTP_CONNECTION_TIMING = 405,
+    FTP_PASSIVE_MODE = 408,
+    FTP_HOST_CONNECTION_ERROR = 409,
+    FTP_SUBFOLDER_NAME_METHOD = 411,
+    FTP_HISTORY_DATA_TX = 412,
+
+    // -- FTP communication settings (read data) --
+    FTP_DATA_TX = 420,
+    FTP_DATA_REMOTE_IP = 421,
+    FTP_DATA_USER_NAME = 422,
+    FTP_DATA_PASSWORD = 423,
+    FTP_DATA_SUBFOLDER = 424,
+    FTP_DATA_SUBFOLDER_NAME = 425,
+    FTP_DATA_CONNECTION_TIMING = 426,
+    FTP_DATA_PASSIVE_MODE = 429,
+    FTP_DATA_APPEND_PRECEDING = 430,
+    FTP_DATA_FILE_NAME = 431,
+    FTP_DATA_HOST_CONNECTION_ERROR = 432,
+
+    // -- Security settings --
+    SFTP = 440,
+    SFTP_REMOTE_PORT = 441,
+    FTP_REMOTE_PORT = 442,
+
+    // -- Master/Slave function --
+    MASTER_SLAVE_OPERATION = 500,
+    MASTER_SLAVE_ID = 501,
+    MASTER_SLAVE_GROUP_NAME = 503,
+
+    // -- SNTP settings --
+    SNTP_SERVER_ADDRESS = 520,
+    SNTP_TIME_ZONE = 521,
+    SNTP_UPDATE_CYCLE = 522,
+
+    // -- SR Web Tool settings --
+    SR_WEB_TOOL = 530,
+    SR_WEB_PASSWORD_AUTH = 535,
+    SR_WEB_PORT_NUMBER = 536,
+    HTTPS = 538,
+    VNC_SERVER = 550,
+
+    // -- SR Web Tool user accounts --
+    ADMIN_USERNAME = 560,
+    ADMIN_PASSWORD = 561,
+    USER1_USERNAME = 562,
+    USER1_PASSWORD = 563,
+    USER1_APPLICATIONS = 564,
+    USER2_USERNAME = 565,
+    USER2_PASSWORD = 566,
+    USER2_APPLICATIONS = 567,
+    USER3_USERNAME = 568,
+    USER3_PASSWORD = 569,
+    USER3_APPLICATIONS = 570,
+    USER4_USERNAME = 571,
+    USER4_PASSWORD = 572,
+    USER4_APPLICATIONS = 573,
+};
+
+}  // namespace OpenSRX

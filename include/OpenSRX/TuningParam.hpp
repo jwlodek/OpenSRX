@@ -1,0 +1,131 @@
+#pragma once
+
+#include "OpenSRX/ParamValues.hpp"
+
+namespace OpenSRX {
+
+/**
+ * @brief Command numbers for tuning code settings (WC/RC commands).
+ *
+ * Used with the WC (write config) and RC (read config) commands in the format:
+ *   WC,m,n  (write)   RC,m  (read)
+ * where m = command number, n = setting value.
+ *
+ * Value enums shared with bank parameters (Toggle, InverseMode, ReverseMode,
+ * NW7CheckDigitType, NW7StartStopLetterType, UpcAOutput, PharmacodeReadDirection,
+ * PDF417ReadCodeType, etc.) are defined in ParamValues.hpp.
+ */
+enum class TuningParam {
+    // -- QR code --
+    QR_MAX_READ_LENGTH = 100,
+    QR_MIN_READ_LENGTH = 101,
+
+    // -- Data Matrix --
+    DATAMATRIX_MAX_READ_LENGTH = 200,
+    DATAMATRIX_MIN_READ_LENGTH = 201,
+    DATAMATRIX_DMRE_READ = 1926,
+
+    // -- PDF417 --
+    PDF417_MAX_READ_LENGTH = 300,
+    PDF417_MIN_READ_LENGTH = 301,
+    PDF417_TARGET_CODE = 303,
+
+    // -- MaxiCode --
+    MAXICODE_MAX_READ_LENGTH = 1924,
+    MAXICODE_MIN_READ_LENGTH = 1925,
+
+    // -- GS1 DataBar --
+    GS1_DATABAR_MAX_READ_LENGTH = 500,
+    GS1_DATABAR_MIN_READ_LENGTH = 501,
+    GS1_DATABAR_RIGHT_QUIET_ZONE_RATIO = 502,
+    GS1_DATABAR_OMNIDIRECTIONAL = 503,
+    GS1_DATABAR_STACKED = 504,
+    GS1_DATABAR_LIMITED = 505,
+    GS1_DATABAR_EXPANDED = 506,
+    GS1_DATABAR_EXPANDED_STACKED = 507,
+    GS1_DATABAR_EXPANDED_STACKED_ROWS_MIN = 508,
+    GS1_DATABAR_EXPANDED_STACKED_ROWS_MAX = 509,
+
+    // -- CODE 39 --
+    CODE39_MAX_READ_LENGTH = 600,
+    CODE39_MIN_READ_LENGTH = 601,
+    CODE39_QUIET_ZONE_RATIO = 602,
+    CODE39_SEND_START_STOP = 603,
+    CODE39_INSPECT_CHECK_DIGIT = 604,
+    CODE39_SEND_CHECK_DIGIT = 605,
+    CODE39_TRIOPTIC_READING = 606,
+    CODE39_FULL_ASCII = 607,
+
+    // -- ITF --
+    ITF_MAX_READ_LENGTH = 700,
+    ITF_MIN_READ_LENGTH = 701,
+    ITF_QUIET_ZONE_RATIO = 702,
+    ITF_INSPECT_CHECK_DIGIT = 703,
+    ITF_SEND_CHECK_DIGIT = 704,
+
+    // -- 2 of 5 (Industrial 2of5) --
+    TWO_OF_5_MAX_READ_LENGTH = 800,
+    TWO_OF_5_MIN_READ_LENGTH = 801,
+    TWO_OF_5_QUIET_ZONE_RATIO = 802,
+
+    // -- NW-7 (CodaBar) --
+    NW7_MAX_READ_LENGTH = 900,
+    NW7_MIN_READ_LENGTH = 901,
+    NW7_QUIET_ZONE_RATIO = 902,
+    NW7_SEND_START_STOP = 903,
+    NW7_START_STOP_LETTER_TYPE = 904,
+    NW7_INSPECT_CHECK_DIGIT = 905,
+    NW7_SEND_CHECK_DIGIT = 906,
+    NW7_CHECK_DIGIT_TYPE = 907,
+
+    // -- JAN/EAN/UPC --
+    JAN_EAN_UPC_QUIET_ZONE_RATIO = 1002,
+    UPC_E_READING = 1003,
+    EAN_JAN_8_READING = 1004,
+    EAN_JAN_13_READING = 1005,
+    UPC_A_OUTPUT = 1006,
+    UPC_E_NUMBER_SYSTEM = 1007,
+    SUPPLEMENTAL_2_DIGIT = 1008,
+    SUPPLEMENTAL_5_DIGIT = 1009,
+    IGNORE_UPC_WITHOUT_SUPPLEMENTAL = 1010,
+    GTIN_14_DIGIT_OUTPUT = 1011,
+
+    // -- CODE 128 --
+    CODE128_MAX_READ_LENGTH = 1100,
+    CODE128_MIN_READ_LENGTH = 1101,
+    CODE128_QUIET_ZONE_RATIO = 1102,
+    CODE128_GS1_128 = 1103,
+
+    // -- COOP 2 of 5 --
+    COOP_2OF5_MAX_READ_LENGTH = 1200,
+    COOP_2OF5_MIN_READ_LENGTH = 1201,
+    COOP_2OF5_QUIET_ZONE_RATIO = 1202,
+
+    // -- CODE 93 --
+    CODE93_MAX_READ_LENGTH = 1300,
+    CODE93_MIN_READ_LENGTH = 1301,
+    CODE93_QUIET_ZONE_RATIO = 1302,
+
+    // -- Pharmacode --
+    PHARMACODE_MAX_BARS = 1800,
+    PHARMACODE_MIN_BARS = 1801,
+    PHARMACODE_QUIET_ZONE_RATIO = 1802,
+    PHARMACODE_READ_DIRECTION = 1803,
+    PHARMACODE_BINARY_OUTPUT = 1805,
+
+    // -- Aztec Code --
+    AZTEC_MAX_READ_LENGTH = 1903,
+    AZTEC_MIN_READ_LENGTH = 1904,
+
+    // -- Postal --
+    POSTAL_INTELLIGENT_MAIL = 1905,
+    POSTAL_JAPAN_READING = 1908,
+    POSTAL_MAX_READ_LENGTH = 1909,
+    POSTAL_MIN_READ_LENGTH = 1910,
+
+    // -- DotCode --
+    DOTCODE_MAX_READ_LENGTH = 1920,
+    DOTCODE_MIN_READ_LENGTH = 1921,
+};
+
+}  // namespace OpenSRX
